@@ -1,7 +1,7 @@
 # AMMIX
 
 - Remix, MongoDB 기반의 Web Application
-- 이름 `AMMIX`는 'AI MENTO'와 'Remix'를 조합하였으며 에이믹스('eimiks') 라고 발음한다.
+- 이름 `AMMIX`는 'AI MENTO'와 'Remix'를 조합하였으며 `아믹스(amiks)`로 발음한다.
 
 ## 프로젝트 만들기
 
