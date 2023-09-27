@@ -55,12 +55,13 @@ export const userSignIn = async (username: any, password: any) => {
     username: userInfo?.username,
     password: auths.secret.bcrypt,
   };
-
   if (!result.username) {
     throw new Error("Invalid User");
   }
 
-  const comparePassword = bcrypt.compare(password, result.password);
+  const comparePassword = await bcrypt.compare(password, result.password);
+
+  console.log(comparePassword);
 
   if (!comparePassword) {
     throw new Error("Invalid Password");
