@@ -9,7 +9,7 @@ const UsersSchema = new Schema({
       secret: {
         bcrypt: { type: String },
         token: { type: String, unique: true },
-        expireAt: { type: String, default: 120 },
+        expireAt: { type: String },
       },
     },
   ],
@@ -18,10 +18,9 @@ const UsersSchema = new Schema({
       address: { type: String, unique: true },
       verified: { type: Boolean },
       token: { type: String, unique: true },
-      expireAt: { type: String, default: 1200 },
+      expireAt: { type: String },
     },
   ],
-  loginToken: { type: String, unique: true, expire: 120 },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date },
 });
