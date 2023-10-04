@@ -124,7 +124,7 @@ export default function SignUp() {
       </div>
       <div>
         <label>password</label>
-        <input type="password" name="password" />
+        <input type="password" minLength="5" "name="password" />
       </div>
       <div>
         <label>email</label>
