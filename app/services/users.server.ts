@@ -1,12 +1,12 @@
-import bcrypt, { hash } from "bcrypt";
+// import bcrypt, { hash } from "bcrypt";
 import mongoose from "mongoose";
 import { Users } from "../models/users.server";
 import { validateEmail } from "../utils/validator";
+import { redirect, json } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { Form, useActionData } from "@remix-run/react";
 
 mongoose.connect("mongodb://localhost:27017/aimento");
-export let loader: any = async () => {
-  return await Users.find({});
-};
 
 export const userSignUp = async (email: any, password: any, username: any) => {
   validateEmail(email);
@@ -45,29 +45,4 @@ export const userSignUp = async (email: any, password: any, username: any) => {
   });
 
   return newUser;
-};
-
-export const userSignIn = async (username: any, password: any) => {
-  const userInfo = await Users.findOne({ username: username });
-  const [auths] = userInfo?.auths;
-
-  const result = {
-    username: userInfo?.username,
-    password: auths.secret.bcrypt,
-  };
-  if (!result.username) {
-    throw new Error("Invalid User");
-  }
-
-  const comparePassword = await bcrypt.compare(password, result.password);
-
-  console.log(comparePassword);
-
-  if (!comparePassword) {
-    throw new Error("Invalid Password");
-  }
-
-  const signUser = await Users.findOne({ username: username });
-
-  return signUser;
 };

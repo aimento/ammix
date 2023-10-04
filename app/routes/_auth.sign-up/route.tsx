@@ -1,6 +1,7 @@
 import { commitSession, getSession } from "~/services/session.server";
 import { userSignUp } from "../../services/users.server";
 import { redirect, type ActionFunctionArgs } from "@remix-run/node";
+import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
 
 export default function SignUp() {
   return (
@@ -44,4 +45,9 @@ export async function action({ request }: ActionFunctionArgs) {
   let headers = new Headers({ "Set-Cookie": await commitSession(session) });
 
   return redirect(returnTo || "/", { headers });
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  return redirect("/sign-up");
 }
