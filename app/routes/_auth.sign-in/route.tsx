@@ -57,7 +57,7 @@ export default function SignIn() {
   return (
     <form method="POST">
       <div>
-        {data ? <em>Invalid User Data</em> : null}
+        {data ? <h4>Invalid User Data</h4> : null}
         <br></br>
         <label>username</label>
         <input
@@ -69,9 +69,10 @@ export default function SignIn() {
       <div>
         <label>password</label>
         <input
-          type="text"
+          type="password"
           defaultValue={data?.errors.password}
           name="password"
+          minLength="5"
         />
       </div>
       <button type="submit">Sign In</button>
