@@ -18,8 +18,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (!userInfo) {
     errors = { errorStatus: "Invalid User", username: username };
-  }
-  if (Object.keys(errors).length > 0) {
     return json({ errors });
   }
 
@@ -34,8 +32,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (!comparePassword) {
     errors = { errorStatus: "Invalid User", username: username };
-  }
-  if (Object.keys(errors).length > 0) {
     return json({ errors });
   }
 

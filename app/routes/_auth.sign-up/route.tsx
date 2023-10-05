@@ -29,8 +29,7 @@ export async function action({ request }: ActionFunctionArgs) {
         email: email,
         username: username,
       };
-    }
-    if (Object.keys(errors).length > 0) {
+
       return json({ errors });
     }
   };
@@ -60,8 +59,6 @@ export async function action({ request }: ActionFunctionArgs) {
       email: email,
       username: username,
     };
-  }
-  if (Object.keys(errors).length > 0) {
     return json({ errors });
   }
 
@@ -124,7 +121,7 @@ export default function SignUp() {
       </div>
       <div>
         <label>password</label>
-        <input type="password" minLength="5" "name="password" />
+        <input type="password" minLength="5" name="password" />
       </div>
       <div>
         <label>email</label>
