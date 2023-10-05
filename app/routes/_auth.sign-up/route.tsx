@@ -36,6 +36,14 @@ export async function action({ request }: ActionFunctionArgs) {
 
   validateEmail(`${email}`);
 
+  if (!password) {
+    errors = {
+      errorStatus: "Password is empty",
+      email: email,
+      username: username,
+    };
+  }
+
   const getName = await Users.findOne({ username: username });
 
   if (getName) {
