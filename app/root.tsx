@@ -1,4 +1,6 @@
-import { cssBundleHref } from "@remix-run/css-bundle";
+import stylesheet from "./tailwind.css";
+
+// import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
 import {
   Links,
@@ -10,7 +12,8 @@ import {
 } from "@remix-run/react";
 
 export const links: LinksFunction = () => [
-  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+  // ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+  { rel: "stylesheet", href: stylesheet },
 ];
 
 export default function App() {
@@ -21,6 +24,8 @@ export default function App() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        {/* "~/tailwind.css" */}
+        {/* <link rel="stylesheet" href="./tailwind.css" /> */}
       </head>
       <body>
         <Outlet />

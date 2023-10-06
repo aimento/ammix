@@ -5,8 +5,8 @@ import { redirect, type ActionFunctionArgs } from "@remix-run/node";
 export default function SignIn() {
   return (
     <form method="POST">
-      <div>
-        <label>username</label>
+      <div className="text-3xl font-bold underline">
+        <label className="bg-teal-400">username</label>
         <input type="text" name="username" />
       </div>
       <div>
