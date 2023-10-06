@@ -53,7 +53,7 @@ export async function action({ request }: ActionFunctionArgs) {
     from: process.env.EMAIL,
     subject: "AIMento - Recovery Password Link",
     text: "Click here for change your password.",
-    html: `<a href='http://localhost:4000/reset-password?token=${token}'> Click here for change your password </a>`,
+    html: `<a href='http://localhost:${process.env.PORT}/reset-password?token=${token}'> Click here for change your password </a>`,
   };
 
   sendGrid

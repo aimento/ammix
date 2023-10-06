@@ -4,10 +4,11 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { Users } from "../../models/users.server";
 import bcrypt from "bcryptjs";
-import { validateUserName, validatePassword } from "../../utils/validator";
+import { validateUserName, validatePassword } from "../../utils/validator"
 import { reconnectServer } from "../../services/dbconnect.server";
 import AuthButton from "../components/_auth.button";
-import { MongoCredentials } from "mongodb";
+import React, { useState, useEffect } from "react";
+import { sessionCommit } from "~/services/commit.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   reconnectServer();
@@ -29,14 +30,14 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (usernameValidate !== true) {
     const { status } = usernameValidate;
-    errors = { status: status, username: username };
+    errors = { status: status, username: username, message: "test" };
     return json({ errors });
   }
 
   if (!userInfo) {
     errors = {
-      errorStatus: "Invalid User",
-      message: "아이디가 잘못되었습니다.",
+      status: 1,
+      message: "아이디가 잘못되었습니다",
       username: username,
     };
     return json({ errors });
@@ -63,32 +64,20 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (!comparePassword) {
     errors = {
-      status: "Invalid User Data",
+      status: 2,
       username: username,
       message: "비밀번호가 틀렸습니다.",
     };
     return json({ errors });
-  }
+  } // DB의 유저 비밀번호와 맞지 않을 경우
 
+  const sessionId = userInfo._id
+  
   let session = await getSession(request.headers.get("cookie"));
+  const returnTo = session.get("returnTo");
+  const headers = await sessionCommit(request, sessionId);
 
-  //여기서부터
-  session.set("userdata", {
-    userId: username,
-  });
-
-  // 수정된 부분: 로그인 후 세션 데이터를 로그로 출력
-  console.log(
-    "Session data after login:",
-    JSON.stringify(session.data, null, 2)
-  );
-  //여기까지 삭제해도 되요 건률님
-
-  session.unset("returnTo");
-
-  let headers = new Headers({ "Set-Cookie": await commitSession(session) });
-
-  return redirect("/", { headers });
+  return redirect(returnTo || "/", { headers });
 }
 
 export default function SignIn() {
@@ -96,6 +85,7 @@ export default function SignIn() {
   const isSubmitting =
     navigation.state === "submitting" || navigation.state === "loading";
   const data = useActionData<typeof action>();
+  console.log(data);
 
   return (
     <div className="h-screen flex justify-center items-center">
@@ -132,7 +122,7 @@ export default function SignIn() {
             name="password"
             minLength="5"
             className={`h-12 mt-1 p-2 border rounded-md ${
-              data?.errors.status === "Invalid User Data"
+              data?.errors.status === 2
                 ? "border-red-500"
                 : ""
             }`}
