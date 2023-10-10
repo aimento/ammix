@@ -8,7 +8,7 @@ const UsersSchema = new Schema({
       id: { type: String, require: true, unique: true },
       secret: {
         bcrypt: { type: String },
-        token: { type: String, unique: true },
+        token: { type: String },
         expireAt: { type: String },
       },
     },
@@ -17,7 +17,7 @@ const UsersSchema = new Schema({
     {
       address: { type: String, unique: true },
       verified: { type: Boolean },
-      token: { type: String, unique: true },
+      token: { type: String },
       expireAt: { type: String },
     },
   ],
