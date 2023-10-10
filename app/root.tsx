@@ -1,4 +1,6 @@
-import { cssBundleHref } from "@remix-run/css-bundle";
+// import { cssBundleHref } from "@remix-run/css-bundle";
+import stylesheet from "./styles.css";
+
 import type { LinksFunction } from "@remix-run/node";
 import {
   Links,
@@ -11,7 +13,8 @@ import {
 import mongoose from "mongoose";
 
 export const links: LinksFunction = () => [
-  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+  // ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+  { rel: "stylesheet", href: stylesheet },
 ];
 
 mongoose.connect(process.env.DB_URI)
