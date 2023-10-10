@@ -33,10 +33,11 @@ export default function SignIn() {
         </div>
         <button
           type="submit"
-          className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
+          className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
         >
           로그인
         </button>
+        <button className="text-gray-700">비밀번호 찾기</button>
       </form>
     </div>
   );
