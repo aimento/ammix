@@ -108,26 +108,53 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function SignUp() {
   const data = useActionData<typeof action>();
   return (
-    <form method="POST">
-      <div>
-        {data ? <h4>{data.errors.errorStatus}</h4> : null}
-        <br></br>
-        <label>username</label>
-        <input
-          type="text"
-          defaultValue={data?.errors.username}
-          name="username"
-        />
-      </div>
-      <div>
-        <label>password</label>
-        <input type="password" minLength="5" name="password" />
-      </div>
-      <div>
-        <label>email</label>
-        <input type="text" defaultValue={data?.errors.email} name="email" />
-      </div>
-      <button type="submit">Sign Up</button>
-    </form>
+    <div className="h-screen flex justify-center items-center">
+      <form
+        method="POST"
+        className="w-full max-w-lg p-8 flex flex-col space-y-6"
+      >
+        <div className="flex flex-col space-y-2">
+          {data ? <h4>{data.errors.errorStatus}</h4> : null}
+          <br></br>
+          <label className="block text-sm font-medium text-gray-700">
+            아이디
+          </label>
+          <input
+            type="text"
+            defaultValue={data?.errors.username}
+            name="username"
+            className="h-12 mt-1 p-2 border rounded-md"
+          />
+        </div>
+        <div className="flex flex-col space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            비밀번호
+          </label>
+          <input
+            type="password"
+            minLength="5"
+            name="password"
+            className="h-12 mt-1 p-2 border rounded-md"
+          />
+        </div>
+        <div className="flex flex-col space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            이메일
+          </label>
+          <input
+            type="text"
+            defaultValue={data?.errors.email}
+            name="email"
+            className="h-12 mt-1 p-2 border rounded-md"
+          />
+        </div>
+        <button
+          type="submit"
+          className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
+        >
+          회원가입
+        </button>
+      </form>
+    </div>
   );
 }
