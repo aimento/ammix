@@ -5,7 +5,7 @@ const UsersSchema = new Schema({
   auths: [
     {
       channel: { type: String, require: true },
-      id: { type: String, require: true, unique: true },
+      id: { type: String, require: true },
       secret: {
         bcrypt: { type: String },
         token: { type: String },
@@ -21,6 +21,11 @@ const UsersSchema = new Schema({
       expireAt: { type: String },
     },
   ],
+  avatar: 
+  {
+    name: {type: String},
+    imageUrl: { type: String}
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date },
 });

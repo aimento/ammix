@@ -8,10 +8,20 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import mongoose from "mongoose";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
+
+mongoose.connect(process.env.DB_URI)
+.then(() => {
+  console.log('Database has been Connected');
+})
+.catch((error) => {
+  console.error('Error during Database Connection', error);
+});
+
 
 export default function App() {
   return (

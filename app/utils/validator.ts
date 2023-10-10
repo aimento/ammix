@@ -1,5 +1,3 @@
-import { json } from "@remix-run/node";
-
 export const validateEmail = (email) => {
 
   if(!email) {
@@ -15,4 +13,23 @@ export const validateEmail = (email) => {
     const status = { status: "Invalid email", email: email }
     return status;
   }
+
+  return true;
 };
+
+export const validateUserName = (username) => {
+  if(!username){
+    const status = { status: "username is empty"}
+    return status;
+  }
+  return true;
+}
+
+export const validatePassword = (password) => {
+  if(!password){
+    const status = { status: "password is empty"}
+    return status;
+  }
+
+  return true;
+}
