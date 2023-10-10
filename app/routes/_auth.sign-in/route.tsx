@@ -16,8 +16,16 @@ export async function action({ request }: ActionFunctionArgs) {
   const userInfo = await Users.findOne({ username: username });
   let errors = {};
 
+  // if (!userInfo) {
+  //   errors = { errorStatus: "Invalid User", username: username };
+  //   return json({ errors });
+  // }
   if (!userInfo) {
-    errors = { errorStatus: "Invalid User", username: username };
+    errors = {
+      errorStatus: "Invalid User",
+      message: "아이디가 잘못되었습니다.",
+      username: username,
+    };
     return json({ errors });
   }
 
@@ -30,11 +38,18 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const comparePassword = await bcrypt.compare(password, result.password);
 
+  // if (!comparePassword) {
+  //   errors = { errorStatus: "Invalid User", username: username };
+  //   return json({ errors });
+  // }
   if (!comparePassword) {
-    errors = { errorStatus: "Invalid User", username: username };
+    errors = {
+      errorStatus: "Invalid User",
+      message: "비밀번호가 잘못되었습니다.",
+      username: username,
+    };
     return json({ errors });
   }
-
   console.log("user logined", userInfo);
 
   let session = await getSession(request.headers.get("cookie"));
@@ -57,7 +72,7 @@ export default function SignIn() {
         className="w-full max-w-lg p-8 flex flex-col space-y-6"
       >
         <div className="flex flex-col space-y-2">
-          {data ? <h4>Invalid User Data</h4> : null}
+          {/* {data ? <h4>{data.errors.message}</h4> : null} */}
           <br></br>
           <label className="block text-sm font-medium text-gray-700">
             아이디
@@ -66,7 +81,11 @@ export default function SignIn() {
             type="text"
             defaultValue={data?.errors.username}
             name="username"
-            className="h-12 mt-1 p-2 border rounded-md"
+            className={`h-12 mt-1 p-2 border rounded-md ${
+              data?.errors.message && data?.errors.message.includes("아이디")
+                ? "border-red-500"
+                : ""
+            }`}
           />
         </div>
         <div className="flex flex-col space-y-2">
@@ -78,8 +97,16 @@ export default function SignIn() {
             defaultValue={data?.errors.password}
             name="password"
             minLength="5"
-            className="h-12 mt-1 p-2 border rounded-md"
+            className={`h-12 mt-1 p-2 border rounded-md ${
+              data?.errors.message ? "border-red-500" : ""
+            }`}
           />
+          {/* {data?.errors.message ? (
+            <p className="text-red-500">{data.errors.message}</p>
+          ) : null} */}
+          {data?.errors.message ? (
+            <p className="text-red-500">{data.errors.message}</p> // 수정된 부분
+          ) : null}
         </div>
         <button
           type="submit"
@@ -87,6 +114,7 @@ export default function SignIn() {
         >
           로그인
         </button>
+        <button>비밀번호 찾기</button>
       </form>
     </div>
   );

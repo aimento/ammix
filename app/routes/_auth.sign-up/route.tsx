@@ -40,9 +40,10 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (getName) {
     errors = {
-      errorStatus: "Duplicated username",
-      email: email,
+      errorStatus: "중복된 아이디입니다.",
+      // email: email,
       username: username,
+      message: "중복된 아이디입니다.",
     };
   }
 
@@ -57,7 +58,8 @@ export async function action({ request }: ActionFunctionArgs) {
     errors = {
       errorStatus: "Duplicated email",
       email: email,
-      username: username,
+      // username: username,
+      message: "중복된 이메일입니다.",
     };
     return json({ errors });
   }
@@ -114,7 +116,7 @@ export default function SignUp() {
         className="w-full max-w-lg p-8 flex flex-col space-y-6"
       >
         <div className="flex flex-col space-y-2">
-          {data ? <h4>{data.errors.errorStatus}</h4> : null}
+          {/* {data ? <h4>{data.errors.message}</h4> : null} */}
           <br></br>
           <label className="block text-sm font-medium text-gray-700">
             아이디
@@ -123,7 +125,12 @@ export default function SignUp() {
             type="text"
             defaultValue={data?.errors.username}
             name="username"
-            className="h-12 mt-1 p-2 border rounded-md"
+            // className={`h-12 mt-1 p-2 border rounded-md ${
+            //   data?.errors.username ? "border-red-500" : ""
+            // }`}
+            className={`h-12 mt-1 p-2 border rounded-md ${
+              data?.errors.username ? "border-red-500" : ""
+            } ${data?.errors.email ? "" : "border-gray-300"}`}
           />
         </div>
         <div className="flex flex-col space-y-2">
@@ -145,8 +152,16 @@ export default function SignUp() {
             type="text"
             defaultValue={data?.errors.email}
             name="email"
-            className="h-12 mt-1 p-2 border rounded-md"
+            // className={`h-12 mt-1 p-2 border rounded-md ${
+            //   data?.errors.email ? "border-red-500" : ""
+            // }`}
+            className={`h-12 mt-1 p-2 border rounded-md ${
+              data?.errors.email ? "border-red-500" : ""
+            } ${data?.errors.username ? "" : "border-gray-300"}`}
           />
+          {data?.errors.message ? (
+            <p className="text-red-500">{data.errors.message}</p>
+          ) : null}
         </div>
         <button
           type="submit"
