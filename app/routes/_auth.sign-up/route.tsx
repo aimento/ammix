@@ -4,21 +4,52 @@ import { redirect, type ActionFunctionArgs } from "@remix-run/node";
 
 export default function SignUp() {
   return (
-    <form method="POST">
-      <div>
-        <label>username</label>
-        <input type="text" name="username" />
-      </div>
-      <div>
-        <label>password</label>
-        <input type="text" name="password" />
-      </div>
-      <div>
-        <label>email</label>
-        <input type="text" name="email" />
-      </div>
-      <button type="submit">Sign Up</button>
-    </form>
+    <div className="h-screen flex justify-center items-center">
+      <form
+        method="POST"
+        className="w-full max-w-lg p-8 flex flex-col space-y-6"
+      >
+        <div className="flex flex-col space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            아이디
+          </label>
+          <input
+            type="text"
+            name="username"
+            placeholder="아이디를 입력하세요"
+            className="h-12 mt-1 p-2 border rounded-md"
+          />
+        </div>
+        <div className="flex flex-col space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            비밀번호
+          </label>
+          <input
+            type="text"
+            name="password"
+            placeholder="비밀번호를 입력하세요"
+            className="h-12 mt-1 p-2 border rounded-md"
+          />
+        </div>
+        <div className="flex flex-col space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            이메일
+          </label>
+          <input
+            type="text"
+            name="email"
+            placeholder="이메일을 입력하세요"
+            className="h-12 mt-1 p-2 border rounded-md"
+          />
+        </div>
+        <button
+          type="submit"
+          className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
+        >
+          회원가입
+        </button>
+      </form>
+    </div>
   );
 }
 
