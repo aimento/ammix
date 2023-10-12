@@ -3,22 +3,22 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { Users } from "../../models/users.server";
 import { validateEmail } from "~/utils/validator";
 import sendGrid from "@sendgrid/mail";
-import mongoose from "mongoose";
 import { Form, useActionData } from "@remix-run/react";
-
-mongoose.connect("mongodb://localhost:27017/aimento");
+import { reconnectServer } from "../../services/dbconnect.server";
 
 export async function action({ request }: ActionFunctionArgs) {
+  reconnectServer();
+  
   const formData = await request.formData();
 
   const email = formData.get("email");
 
-  const validate = await validateEmail(email) // 이메일 양식 검증
+  const emailValidate = await validateEmail(email) // 이메일 양식 검증
 
   let status = {};
 
-  if (validate) {
-    status = validate;
+  if (emailValidate !== true) {
+    status = emailValidate;
     return json({status})
   }
 
@@ -35,15 +35,11 @@ export async function action({ request }: ActionFunctionArgs) {
     { "emails.address": email },
     {
       $set: {
-        auths: {
-          secret: {
-            token: Math.random().toString(36).substring(2, 15),
-            expireAt: new Date(new Date().getTime() + 2 * 60 * 60 * 1000),
+        'auths.0.secret.token': Math.random().toString(36).substring(2, 15),
+        'auths.0.secret.expireAt': new Date(new Date().getTime() + 2 * 60 * 60 * 1000),
           },
-        },
       },
-    }
-  ); // 비밀번호 토큰 생성
+  ); 
 
   userInfo = await Users.findOne({ "emails.address": email });
   const token = userInfo.auths[0].secret.token;
@@ -60,8 +56,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
   sendGrid
     .send(message)
-    .then((response) => {
-      console.log(response);
+    .then(() => {
+      console.log("Mail transfer is complete");
     })
     .catch((error) => {
       console.error(error);

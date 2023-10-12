@@ -1,14 +1,15 @@
 import { redirect, json } from "@remix-run/node";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { Users } from "../../models/users.server";
-import mongoose from "mongoose";
 import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
 import bcrypt from "bcryptjs";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
-
-mongoose.connect("mongodb://localhost:27017/aimento");
+import { validatePassword } from "../../utils/validator"
+import { reconnectServer } from "../../services/dbconnect.server";
 
 export async function action({ request }: ActionFunctionArgs) {
+  reconnectServer();
+  
   const formData = await request.formData();
   const url = new URL(request.url);
   const query = url.searchParams.get("token");
@@ -26,13 +27,16 @@ export async function action({ request }: ActionFunctionArgs) {
 
   let errors = {};
 
-  if (!password) {
-    errors = { errorStatus: "password is empty" };
-    return json({ errors });
-  } // 비밀번호가 없을 경우
+  const passwordValidate = validatePassword(password); // password 양식 검증
+
+  if (passwordValidate !== true) {
+    const { status } = passwordValidate
+    errors = { status: status };
+    return json({ errors })
+  }
 
   if (password !== confirmPassword) {
-    errors = { errorStatus: "password dosen't match" };
+    errors = { status: "password dosen't match" };
     return json({ errors });
   } // 비밀번호와 확인비밀번호가 다를 경우 
 
@@ -41,22 +45,16 @@ export async function action({ request }: ActionFunctionArgs) {
   await Users.updateOne(
     { "auths.secret.token": query },
     {
-      $set: {
-        auths: {
-          secret: {
-            bcrypt: hashedPassword,
-          },
-        },
-      },
-    },
-    {
       $unset: {
-        'auths.secret.token': 1,
-        'auths.secre.expireAt': 1
+        'auths.0.secret.token': 1,
+        'auths.0.secret.expireAt': 1
+      },
+      $set: {
+        'auths.0.secret.bcrypt': hashedPassword
       }
     }
   );
-
+  
   return redirect("/sign-in");
 }
 
@@ -78,7 +76,7 @@ export async function loader({ request }: LoaderFunctionArgs) {           //quer
     throw new Error("This link was expired. Please try again.");
   } // 토큰 유효기간이 지날 경우
 
-  return null;
+  return true;
 }
 
 export default function ResetPassword() {
@@ -94,7 +92,7 @@ export default function ResetPassword() {
         <label>confirm password</label>
         <input type="password" name="confirmPassword" minLength="5" />
         <br></br>
-        {data ? <em>{data.errors.errorStatus}</em> : null}
+        {data ? <em>{data.errors.status}</em> : null}
         <br></br>
       </div>
       <button type="submit">Submit</button>

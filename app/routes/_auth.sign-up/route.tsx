@@ -2,73 +2,66 @@ import { commitSession, getSession } from "~/services/session.server";
 import { redirect, json } from "@remix-run/node";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { Users } from "../../models/users.server";
-import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { Form, useActionData } from "@remix-run/react";
-
-mongoose.connect("mongodb://localhost:27017/aimento");
+import { validateEmail, validateUserName, validatePassword } from "../../utils/validator"
+import { reconnectServer } from "../../services/dbconnect.server";
 
 export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData();
+  reconnectServer();
 
+  const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
   const username = formData.get("username");
 
   let errors = {};
+  const emailValidate = validateEmail(email); // 이메일 양식 검증
 
-  console.log("user form data", { email, password, username });
-  const validateEmail = (value) => {
-    const validator = new RegExp(
-      /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/
-    );
-
-    if (!validator.test(value)) {
-      errors = {
-        errorStatus: "Please check email",
-        email: email,
-        username: username,
-      };
-
-      return json({ errors });
-    }
-  };
-
-  validateEmail(`${email}`);
-
-  if (!password) {
-    errors = {
-      errorStatus: "Password is empty",
-      email: email,
-      username: username,
-    };
+  if (emailValidate !== true) {
+    const { status } = emailValidate;
+    errors = { status: status, email: email, username: username};
+    return json({ errors })
   }
 
+  const usernameValidate = validateUserName(username); // username 양식 검증
+
+  if (usernameValidate !== true) {
+    const { status } = usernameValidate;
+    errors = { status: status, email: email, username: username };
+    return json({ errors })
+  }
+
+  const passwordValidate = validatePassword(password); // password 양식 검증
+
+  if (passwordValidate !== true) {
+    const { status } = passwordValidate;
+    errors = { status: status, email: email, username: username };
+    return json({ errors })
+  }
+  
   const getName = await Users.findOne({ username: username });
 
   if (getName) {
     errors = {
-      errorStatus: "Duplicated username",
+      status: "Duplicated username",
       email: email,
       username: username,
     };
-  }
 
-  if (Object.keys(errors).length > 0) {
-    console.log(errors);
     return json({ errors });
-  }
+  } // 유저ID가 같은 것이 있을 경우
 
   const getEmail = await Users.findOne({ "emails.address": email });
 
   if (getEmail) {
     errors = {
-      errorStatus: "Duplicated email",
+      status: "Duplicated email",
       email: email,
       username: username,
     };
     return json({ errors });
-  }
+  } // 유저이메일이 같은 것이 있을 경우
 
   const now = new Date();
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -81,8 +74,6 @@ export async function action({ request }: ActionFunctionArgs) {
         id: `${email}`,
         secret: {
           bcrypt: `${hashedPassword}`,
-          token: "",
-          expireAt: "",
         },
       },
     ],
@@ -90,22 +81,29 @@ export async function action({ request }: ActionFunctionArgs) {
       {
         address: `${email}`,
         verified: false,
-        token: "",
-        expireAt: "",
       },
     ],
+    avatar: 
+    {
+      name: "User_" + Math.random().toString(36).substring(2, 11),
+      imageUrl: ""
+    },
     createdAt: now,
     updatedAt: now,
-  });
+  }); // 유저 생성
 
-  const user = await Users.findOne({ "emails.address": email });
+  const userInfo = await Users.findOne({ "emails.address": email });
 
-  console.log("user created", user);
+  const { _id, avatar } = userInfo;
 
   let session = await getSession(request.headers.get("cookie"));
   const returnTo = session.get("returnTo");
 
-  session.set(session.id, user);
+  session.set(session.id, _id);
+  session.set("userdata", {
+    userId: username, 
+    userName: avatar.name, 
+  });
   session.unset("returnTo");
 
   let headers = new Headers({ "Set-Cookie": await commitSession(session) });
@@ -118,7 +116,7 @@ export default function SignUp() {
   return (
     <form method="POST">
       <div>
-        {data ? <h4>{data.errors.errorStatus}</h4> : null}
+        {data ? <h4>{data.errors.status}</h4> : null}
         <br></br>
         <label>username</label>
         <input
