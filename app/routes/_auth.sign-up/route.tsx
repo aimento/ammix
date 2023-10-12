@@ -3,17 +3,18 @@ import { redirect, json } from "@remix-run/node";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { Users } from "../../models/users.server";
 import bcrypt from "bcryptjs";
-<<<<<<< HEAD
 import { Form, useActionData } from "@remix-run/react";
-import { validateEmail, validateUserName, validatePassword } from "../../utils/validator"
+import {
+  validateEmail,
+  validateUserName,
+  validatePassword,
+} from "../../utils/validator";
 import { reconnectServer } from "../../services/dbconnect.server";
-=======
-import { Form, useActionData, useNavigation } from "@remix-run/react";
 import AuthButton from "../components/_auth.button";
 import React, { useState, useEffect } from "react";
+import mongoose from "mongoose";
 
 mongoose.connect("mongodb://localhost:27017/aimento");
->>>>>>> feature/tailwindcss
 
 export async function action({ request }: ActionFunctionArgs) {
   reconnectServer();
@@ -28,8 +29,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (emailValidate !== true) {
     const { status } = emailValidate;
-    errors = { status: status, email: email, username: username};
-    return json({ errors })
+    errors = { status: status, email: email, username: username };
+    return json({ errors });
   }
 
   const usernameValidate = validateUserName(username); // username 양식 검증
@@ -37,7 +38,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (usernameValidate !== true) {
     const { status } = usernameValidate;
     errors = { status: status, email: email, username: username };
-    return json({ errors })
+    return json({ errors });
   }
 
   const passwordValidate = validatePassword(password); // password 양식 검증
@@ -45,20 +46,17 @@ export async function action({ request }: ActionFunctionArgs) {
   if (passwordValidate !== true) {
     const { status } = passwordValidate;
     errors = { status: status, email: email, username: username };
-    return json({ errors })
+    return json({ errors });
   }
-  
+
   const getName = await Users.findOne({ username: username });
 
   if (getName) {
     errors = {
-<<<<<<< HEAD
       status: "Duplicated username",
       email: email,
-=======
       errorStatus: "중복된 아이디입니다.",
       // email: email,
->>>>>>> feature/tailwindcss
       username: username,
       message: "중복된 아이디입니다.",
     };
@@ -98,10 +96,9 @@ export async function action({ request }: ActionFunctionArgs) {
         verified: false,
       },
     ],
-    avatar: 
-    {
+    avatar: {
       name: "User_" + Math.random().toString(36).substring(2, 11),
-      imageUrl: ""
+      imageUrl: "",
     },
     createdAt: now,
     updatedAt: now,
@@ -116,8 +113,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
   session.set(session.id, _id);
   session.set("userdata", {
-    userId: username, 
-    userName: avatar.name, 
+    userId: username,
+    userName: avatar.name,
   });
   session.unset("returnTo");
 
@@ -136,47 +133,15 @@ export default function SignUp() {
   const data = useActionData<typeof action>();
 
   return (
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <form method="POST">
-      <div>
-        {data ? <h4>{data.errors.status}</h4> : null}
-        <br></br>
-        <label>username</label>
-        <input
-          type="text"
-          defaultValue={data?.errors.username}
-          name="username"
-        />
-      </div>
-      <div>
-        <label>password</label>
-        <input type="password" minLength="5" name="password" />
-      </div>
-      <div>
-        <label>email</label>
-        <input type="text" defaultValue={data?.errors.email} name="email" />
-      </div>
-      <button type="submit">Sign Up</button>
-    </form>
-=======
-    <div className="h-screen flex justify-center items-center">
-      <form
-=======
     <div className="h-screen flex justify-center items-center">
       <Form
         onSubmit={(e) => {
           console.log("Form submitted");
         }}
->>>>>>> feature/tailwindcss
         method="POST"
         className="w-full max-w-lg p-8 flex flex-col space-y-6"
       >
         <div className="flex flex-col space-y-2">
-<<<<<<< HEAD
-          {data ? <h4>{data.errors.errorStatus}</h4> : null}
-=======
->>>>>>> feature/tailwindcss
           <br></br>
           <label className="block text-sm font-medium text-gray-700">
             아이디
@@ -185,13 +150,9 @@ export default function SignUp() {
             type="text"
             defaultValue={data?.errors.username}
             name="username"
-<<<<<<< HEAD
-            className="h-12 mt-1 p-2 border rounded-md"
-=======
             className={`h-12 mt-1 p-2 border rounded-md ${
               data?.errors.username ? "border-red-500" : ""
             } ${data?.errors.email ? "" : "border-gray-300"}`}
->>>>>>> feature/tailwindcss
           />
         </div>
         <div className="flex flex-col space-y-2">
@@ -213,20 +174,6 @@ export default function SignUp() {
             type="text"
             defaultValue={data?.errors.email}
             name="email"
-<<<<<<< HEAD
-            className="h-12 mt-1 p-2 border rounded-md"
-          />
-        </div>
-        <button
-          type="submit"
-          className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
-        >
-          회원가입
-        </button>
-      </form>
-    </div>
->>>>>>> f8249aa (임시커밋)
-=======
             className={`h-12 mt-1 p-2 border rounded-md ${
               data?.errors.email ? "border-red-500" : ""
             } ${data?.errors.username ? "" : "border-gray-300"}`}
@@ -239,6 +186,5 @@ export default function SignUp() {
         <AuthButton label="회원가입" isSubmitting={isSubmitting} />
       </Form>
     </div>
->>>>>>> feature/tailwindcss
   );
 }

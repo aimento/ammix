@@ -1,5 +1,5 @@
 // import { cssBundleHref } from "@remix-run/css-bundle";
-import stylesheet from "./styles.css";
+import stylesheet from "./tailwind.css";
 
 import type { LinksFunction } from "@remix-run/node";
 import {
@@ -17,14 +17,15 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 
-mongoose.connect(process.env.DB_URI)
-.then(() => {
-  console.log('Database has been Connected');
-})
-.catch((error) => {
-  console.error('Error during Database Connection', error);
-});
+// mongoose
+//   .connect(process.env.DB_URI)
 
+//   .then(() => {
+//     console.log("Database has been Connected");
+//   })
+//   .catch((error) => {
+//     console.error("Error during Database Connection", error);
+//   });
 
 export default function App() {
   return (
