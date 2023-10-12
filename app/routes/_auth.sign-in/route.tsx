@@ -1,11 +1,19 @@
 import { commitSession, getSession } from "~/services/session.server";
 import { redirect, json } from "@remix-run/node";
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { Users } from "../../models/users.server";
 import bcrypt from "bcryptjs";
+import AuthButton from "../components/_auth.button";
+import React, { useState, useEffect } from "react";
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+//잠시추가
 
 export async function action({ request }: ActionFunctionArgs) {
+  await sleep(5000);
   const formData = await request.formData();
 
   const username = formData.get("username");
@@ -16,10 +24,6 @@ export async function action({ request }: ActionFunctionArgs) {
   const userInfo = await Users.findOne({ username: username });
   let errors = {};
 
-  // if (!userInfo) {
-  //   errors = { errorStatus: "Invalid User", username: username };
-  //   return json({ errors });
-  // }
   if (!userInfo) {
     errors = {
       errorStatus: "Invalid User",
@@ -38,10 +42,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const comparePassword = await bcrypt.compare(password, result.password);
 
-  // if (!comparePassword) {
-  //   errors = { errorStatus: "Invalid User", username: username };
-  //   return json({ errors });
-  // }
   if (!comparePassword) {
     errors = {
       errorStatus: "Invalid User",
@@ -64,15 +64,23 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function SignIn() {
+  const navigation = useNavigation();
+  const isSubmitting =
+    navigation.state === "submitting" || navigation.state === "loading";
+
+  console.log("Navigation State:", navigation.state);
   const data = useActionData<typeof action>();
+
   return (
     <div className="h-screen flex justify-center items-center">
-      <form
+      <Form
+        onSubmit={(e) => {
+          console.log("Form submitted");
+        }}
         method="POST"
         className="w-full max-w-lg p-8 flex flex-col space-y-6"
       >
         <div className="flex flex-col space-y-2">
-          {/* {data ? <h4>{data.errors.message}</h4> : null} */}
           <br></br>
           <label className="block text-sm font-medium text-gray-700">
             아이디
@@ -101,21 +109,16 @@ export default function SignIn() {
               data?.errors.message ? "border-red-500" : ""
             }`}
           />
-          {/* {data?.errors.message ? (
-            <p className="text-red-500">{data.errors.message}</p>
-          ) : null} */}
+
           {data?.errors.message ? (
-            <p className="text-red-500">{data.errors.message}</p> // 수정된 부분
+            <p className="text-red-500">{data.errors.message}</p>
           ) : null}
         </div>
-        <button
-          type="submit"
-          className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
-        >
-          로그인
-        </button>
+
+        <AuthButton label="로그인" isSubmitting={isSubmitting} />
+
         <button>비밀번호 찾기</button>
-      </form>
+      </Form>
     </div>
   );
 }

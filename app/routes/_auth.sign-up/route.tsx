@@ -4,7 +4,9 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { Users } from "../../models/users.server";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, useActionData, useNavigation } from "@remix-run/react";
+import AuthButton from "../components/_auth.button";
+import React, { useState, useEffect } from "react";
 
 mongoose.connect("mongodb://localhost:27017/aimento");
 
@@ -108,15 +110,24 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function SignUp() {
+  const navigation = useNavigation();
+  const isSubmitting =
+    navigation.state === "submitting" || navigation.state === "loading";
+
+  console.log("Navigation State:", navigation.state);
+
   const data = useActionData<typeof action>();
+
   return (
     <div className="h-screen flex justify-center items-center">
-      <form
+      <Form
+        onSubmit={(e) => {
+          console.log("Form submitted");
+        }}
         method="POST"
         className="w-full max-w-lg p-8 flex flex-col space-y-6"
       >
         <div className="flex flex-col space-y-2">
-          {/* {data ? <h4>{data.errors.message}</h4> : null} */}
           <br></br>
           <label className="block text-sm font-medium text-gray-700">
             아이디
@@ -125,9 +136,6 @@ export default function SignUp() {
             type="text"
             defaultValue={data?.errors.username}
             name="username"
-            // className={`h-12 mt-1 p-2 border rounded-md ${
-            //   data?.errors.username ? "border-red-500" : ""
-            // }`}
             className={`h-12 mt-1 p-2 border rounded-md ${
               data?.errors.username ? "border-red-500" : ""
             } ${data?.errors.email ? "" : "border-gray-300"}`}
@@ -152,9 +160,6 @@ export default function SignUp() {
             type="text"
             defaultValue={data?.errors.email}
             name="email"
-            // className={`h-12 mt-1 p-2 border rounded-md ${
-            //   data?.errors.email ? "border-red-500" : ""
-            // }`}
             className={`h-12 mt-1 p-2 border rounded-md ${
               data?.errors.email ? "border-red-500" : ""
             } ${data?.errors.username ? "" : "border-gray-300"}`}
@@ -163,13 +168,9 @@ export default function SignUp() {
             <p className="text-red-500">{data.errors.message}</p>
           ) : null}
         </div>
-        <button
-          type="submit"
-          className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
-        >
-          회원가입
-        </button>
-      </form>
+
+        <AuthButton label="회원가입" isSubmitting={isSubmitting} />
+      </Form>
     </div>
   );
 }
