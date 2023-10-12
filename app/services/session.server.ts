@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 /**
  * Session 정보를 DB에서 관리한다.
  *
