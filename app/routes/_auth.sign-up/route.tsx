@@ -3,9 +3,17 @@ import { redirect, json } from "@remix-run/node";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { Users } from "../../models/users.server";
 import bcrypt from "bcryptjs";
+<<<<<<< HEAD
 import { Form, useActionData } from "@remix-run/react";
 import { validateEmail, validateUserName, validatePassword } from "../../utils/validator"
 import { reconnectServer } from "../../services/dbconnect.server";
+=======
+import { Form, useActionData, useNavigation } from "@remix-run/react";
+import AuthButton from "../components/_auth.button";
+import React, { useState, useEffect } from "react";
+
+mongoose.connect("mongodb://localhost:27017/aimento");
+>>>>>>> feature/tailwindcss
 
 export async function action({ request }: ActionFunctionArgs) {
   reconnectServer();
@@ -44,9 +52,15 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (getName) {
     errors = {
+<<<<<<< HEAD
       status: "Duplicated username",
       email: email,
+=======
+      errorStatus: "중복된 아이디입니다.",
+      // email: email,
+>>>>>>> feature/tailwindcss
       username: username,
+      message: "중복된 아이디입니다.",
     };
 
     return json({ errors });
@@ -58,7 +72,8 @@ export async function action({ request }: ActionFunctionArgs) {
     errors = {
       status: "Duplicated email",
       email: email,
-      username: username,
+      // username: username,
+      message: "중복된 이메일입니다.",
     };
     return json({ errors });
   } // 유저이메일이 같은 것이 있을 경우
@@ -112,8 +127,16 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function SignUp() {
+  const navigation = useNavigation();
+  const isSubmitting =
+    navigation.state === "submitting" || navigation.state === "loading";
+
+  console.log("Navigation State:", navigation.state);
+
   const data = useActionData<typeof action>();
+
   return (
+<<<<<<< HEAD
 <<<<<<< HEAD
     <form method="POST">
       <div>
@@ -139,11 +162,21 @@ export default function SignUp() {
 =======
     <div className="h-screen flex justify-center items-center">
       <form
+=======
+    <div className="h-screen flex justify-center items-center">
+      <Form
+        onSubmit={(e) => {
+          console.log("Form submitted");
+        }}
+>>>>>>> feature/tailwindcss
         method="POST"
         className="w-full max-w-lg p-8 flex flex-col space-y-6"
       >
         <div className="flex flex-col space-y-2">
+<<<<<<< HEAD
           {data ? <h4>{data.errors.errorStatus}</h4> : null}
+=======
+>>>>>>> feature/tailwindcss
           <br></br>
           <label className="block text-sm font-medium text-gray-700">
             아이디
@@ -152,7 +185,13 @@ export default function SignUp() {
             type="text"
             defaultValue={data?.errors.username}
             name="username"
+<<<<<<< HEAD
             className="h-12 mt-1 p-2 border rounded-md"
+=======
+            className={`h-12 mt-1 p-2 border rounded-md ${
+              data?.errors.username ? "border-red-500" : ""
+            } ${data?.errors.email ? "" : "border-gray-300"}`}
+>>>>>>> feature/tailwindcss
           />
         </div>
         <div className="flex flex-col space-y-2">
@@ -174,6 +213,7 @@ export default function SignUp() {
             type="text"
             defaultValue={data?.errors.email}
             name="email"
+<<<<<<< HEAD
             className="h-12 mt-1 p-2 border rounded-md"
           />
         </div>
@@ -186,5 +226,19 @@ export default function SignUp() {
       </form>
     </div>
 >>>>>>> f8249aa (임시커밋)
+=======
+            className={`h-12 mt-1 p-2 border rounded-md ${
+              data?.errors.email ? "border-red-500" : ""
+            } ${data?.errors.username ? "" : "border-gray-300"}`}
+          />
+          {data?.errors.message ? (
+            <p className="text-red-500">{data.errors.message}</p>
+          ) : null}
+        </div>
+
+        <AuthButton label="회원가입" isSubmitting={isSubmitting} />
+      </Form>
+    </div>
+>>>>>>> feature/tailwindcss
   );
 }
