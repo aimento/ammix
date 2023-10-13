@@ -1,11 +1,14 @@
+import React, { useState } from "react";
 import { json, redirect } from "@remix-run/node";
 import {
   LoaderFunction,
   useLoaderData,
   ActionFunction,
+  useFetcher,
 } from "@remix-run/react";
 import { getSession, commitSession } from "~/services/session.server";
 import { Users } from "~/models/users.server";
+import Modal from "./components/modal";
 
 //세션에서 쿠키의 유저정보 찾기
 export let loader: LoaderFunction = async ({ request }) => {
@@ -35,15 +38,33 @@ export let action: ActionFunction = async ({ request }) => {
 export default function Home() {
   let data = useLoaderData();
   let user = data.user;
+  let fetcher = useFetcher();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    console.log("Opening modal...");
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleLogout = async () => {
+    await fetcher.fetch("/home", { method: "POST" });
+    handleCloseModal();
+  };
 
   return (
     <div>
       {user ? (
         <div>
           <p>Welcome☺️, {user.username}</p>
-          <form method="post" action="">
-            <button type="submit">로그아웃</button>
-          </form>
+          <button onClick={handleOpenModal}>로그아웃</button>
+          {isModalOpen && (
+            <Modal onClose={handleCloseModal} actionUrl="/home" />
+          )}
         </div>
       ) : (
         <div>

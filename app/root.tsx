@@ -17,15 +17,16 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 
-mongoose
-  .connect(process.env.DB_URI)
-
-  .then(() => {
-    console.log("Database has been Connected");
-  })
-  .catch((error) => {
-    console.error("Error during Database Connection", error);
-  });
+if (typeof window === "undefined") {
+  mongoose
+    .connect(process.env.DB_URI)
+    .then(() => {
+      console.log("Database has been Connected");
+    })
+    .catch((error) => {
+      console.error("Error during Database Connection", error);
+    });
+}
 
 export default function App() {
   return (

@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 import { validateUserName, validatePassword } from "../../utils/validator";
 import { reconnectServer } from "../../services/dbconnect.server";
 import AuthButton from "../components/_auth.button";
-import React, { useState, useEffect } from "react";
+import { MongoCredentials } from "mongodb";
 
 export async function action({ request }: ActionFunctionArgs) {
   reconnectServer();
@@ -46,7 +46,10 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (passwordValidate !== true) {
     const { status } = passwordValidate;
-    errors = { status: status, username: username };
+    errors = {
+      status: status,
+      username: username,
+    };
     return json({ errors });
   }
 
@@ -59,15 +62,19 @@ export async function action({ request }: ActionFunctionArgs) {
   const comparePassword = await bcrypt.compare(password, result.password);
 
   if (!comparePassword) {
-    errors = { status: "Invalid User Data", username: username };
+    errors = {
+      status: "Invalid User Data",
+      username: username,
+      message: "비밀번호가 틀렸습니다.",
+    };
     return json({ errors });
   }
 
   let session = await getSession(request.headers.get("cookie"));
 
+  //여기서부터
   session.set("userdata", {
     userId: username,
-    // 여기에 추가로 저장하려는 다른 사용자 정보를 넣을 수 있습니다.
   });
 
   // 수정된 부분: 로그인 후 세션 데이터를 로그로 출력
@@ -75,6 +82,7 @@ export async function action({ request }: ActionFunctionArgs) {
     "Session data after login:",
     JSON.stringify(session.data, null, 2)
   );
+  //여기까지 삭제해도 되요 건률님
 
   session.unset("returnTo");
 
@@ -124,7 +132,9 @@ export default function SignIn() {
             name="password"
             minLength="5"
             className={`h-12 mt-1 p-2 border rounded-md ${
-              data?.errors.message ? "border-red-500" : ""
+              data?.errors.status === "Invalid User Data"
+                ? "border-red-500"
+                : ""
             }`}
           />
 
