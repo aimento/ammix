@@ -4,12 +4,12 @@ import { Users } from "../../models/users.server";
 import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
 import bcrypt from "bcryptjs";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { validatePassword } from "../../utils/validator"
+import { validatePassword } from "../../utils/validator";
 import { reconnectServer } from "../../services/dbconnect.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   reconnectServer();
-  
+
   const formData = await request.formData();
   const url = new URL(request.url);
   const query = url.searchParams.get("token");
@@ -30,15 +30,15 @@ export async function action({ request }: ActionFunctionArgs) {
   const passwordValidate = validatePassword(password); // password 양식 검증
 
   if (passwordValidate !== true) {
-    const { status } = passwordValidate
+    const { status } = passwordValidate;
     errors = { status: status };
-    return json({ errors })
+    return json({ errors });
   }
 
   if (password !== confirmPassword) {
     errors = { status: "password dosen't match" };
     return json({ errors });
-  } // 비밀번호와 확인비밀번호가 다를 경우 
+  } // 비밀번호와 확인비밀번호가 다를 경우
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -46,19 +46,20 @@ export async function action({ request }: ActionFunctionArgs) {
     { "auths.secret.token": query },
     {
       $unset: {
-        'auths.0.secret.token': 1,
-        'auths.0.secret.expireAt': 1
+        "auths.0.secret.token": 1,
+        "auths.0.secret.expireAt": 1,
       },
       $set: {
-        'auths.0.secret.bcrypt': hashedPassword
-      }
+        "auths.0.secret.bcrypt": hashedPassword,
+      },
     }
   );
-  
+
   return redirect("/sign-in");
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {           //query params로 토큰값을 받아 토큰 검증하는 단계
+export async function loader({ request }: LoaderFunctionArgs) {
+  //query params로 토큰값을 받아 토큰 검증하는 단계
   const url = new URL(request.url);
   const query = url.searchParams.get("token");
 
