@@ -3,7 +3,7 @@ import { redirect, json } from "@remix-run/node";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { Users } from "../../models/users.server";
 import bcrypt from "bcryptjs";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, useActionData, useNavigate } from "@remix-run/react";
 import {
   validateEmail,
   validateUserName,
@@ -124,7 +124,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function SignUp() {
-  const navigation = useNavigation();
+  const navigation = useNavigate();
   const isSubmitting =
     navigation.state === "submitting" || navigation.state === "loading";
 
