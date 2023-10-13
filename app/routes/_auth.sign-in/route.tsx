@@ -64,6 +64,18 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   let session = await getSession(request.headers.get("cookie"));
+
+  session.set("userdata", {
+    userId: username,
+    // 여기에 추가로 저장하려는 다른 사용자 정보를 넣을 수 있습니다.
+  });
+
+  // 수정된 부분: 로그인 후 세션 데이터를 로그로 출력
+  console.log(
+    "Session data after login:",
+    JSON.stringify(session.data, null, 2)
+  );
+
   session.unset("returnTo");
 
   let headers = new Headers({ "Set-Cookie": await commitSession(session) });
