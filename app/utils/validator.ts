@@ -1,7 +1,7 @@
 export const validateEmail = (email) => {
 
   if(!email) {
-    const status = { status: "email is empty"}
+    const status = { status: 0 }
     return status;
   }
 
@@ -10,7 +10,7 @@ export const validateEmail = (email) => {
   ); // 대문자 및 소문자, 특수기호, 숫자 등으로 *****@**.** 의 양식이 맞는 지에 대한 검증
 
   if (!validator.test(email)) {
-    const status = { status: "Invalid email", email: email }
+    const status = { status: 1, email: email }
     return status;
   }
 
@@ -19,7 +19,15 @@ export const validateEmail = (email) => {
 
 export const validateUserName = (username) => {
   if(!username){
-    const status = { status: "username is empty"}
+    const status = { status: 1 }
+    return status;
+  }
+  return true;
+}
+
+export const validateValue = (value1, value2) => {
+  if(!value1){
+    const status = { status: `${value2} is empty`}
     return status;
   }
   return true;
@@ -27,7 +35,7 @@ export const validateUserName = (username) => {
 
 export const validatePassword = (password) => {
   if(!password){
-    const status = { status: "password is empty"}
+    const status = { status: 2 }
     return status;
   }
 

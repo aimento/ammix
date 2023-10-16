@@ -14,7 +14,6 @@ import Modal from "./components/modal";
 export let loader: LoaderFunction = async ({ request }) => {
   let session = await getSession(request.headers.get("cookie"));
   let userId = session.get("userdata")?.userId;
-  console.log(session);
 
   let user = null;
   if (userId) {

@@ -11,10 +11,8 @@ import {
 } from "../../utils/validator";
 import { reconnectServer } from "../../services/dbconnect.server";
 import AuthButton from "../components/_auth.button";
+import { sessionCommit } from "../../services/commit.server";
 import React, { useState, useEffect } from "react";
-import mongoose from "mongoose";
-
-mongoose.connect("mongodb://localhost:27017/aimento");
 
 export async function action({ request }: ActionFunctionArgs) {
   reconnectServer();
@@ -98,29 +96,20 @@ export async function action({ request }: ActionFunctionArgs) {
     ],
     avatar: {
       name: "User_" + Math.random().toString(36).substring(2, 11),
-      imageUrl: "",
+      imageUrl: ""
     },
     createdAt: now,
     updatedAt: now,
   }); // 유저 생성
 
   const userInfo = await Users.findOne({ "emails.address": email });
-
-  const { _id, avatar } = userInfo;
+  const sessionId = userInfo._id
 
   let session = await getSession(request.headers.get("cookie"));
   const returnTo = session.get("returnTo");
+  const headers = await sessionCommit(request, sessionId);
 
-  session.set(session.id, _id);
-  session.set("userdata", {
-    userId: username,
-    userName: avatar.name,
-  });
-  session.unset("returnTo");
-
-  let headers = new Headers({ "Set-Cookie": await commitSession(session) });
-
-  return redirect(returnTo || "/", { headers });
+  return redirect( returnTo || "/", { headers });
 }
 
 export default function SignUp() {
