@@ -62,7 +62,11 @@ export default function Home() {
           <p>Welcome☺️, {user.username}</p>
           <button onClick={handleOpenModal}>로그아웃</button>
           {isModalOpen && (
-            <Modal onClose={handleCloseModal} actionUrl="/home" />
+            <Modal
+              onClose={handleCloseModal}
+              actionUrl="/home"
+              message="정말 로그아웃하시겠습니까? :("
+            />
           )}
         </div>
       ) : (
