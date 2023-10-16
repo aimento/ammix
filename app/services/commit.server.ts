@@ -12,7 +12,9 @@ export const sessionCommit = async (request, sessionId) => {
   session.set(session.id, _id);
   session.set("userdata", {
     userId: username,
-    userName: avatar.name,
+    userName: { 
+      firstName: avatar.firstName,
+      lastName: avatar.lastName }
   });
   session.unset("returnTo")
 

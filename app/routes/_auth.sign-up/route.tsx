@@ -95,7 +95,8 @@ export async function action({ request }: ActionFunctionArgs) {
       },
     ],
     avatar: {
-      name: "User_" + Math.random().toString(36).substring(2, 11),
+      firstName: "User_",
+      lastName: Math.random().toString(36).substring(2, 11),
       imageUrl: ""
     },
     createdAt: now,
