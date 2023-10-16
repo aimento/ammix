@@ -4,7 +4,7 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { Users } from "../../models/users.server";
 import bcrypt from "bcryptjs";
-import { validateUserName, validatePassword } from "../../utils/validator"
+import { validateUserName, validatePassword } from "../../utils/validator";
 import { reconnectServer } from "../../services/dbconnect.server";
 import AuthButton from "../components/_auth.button";
 import React, { useState, useEffect } from "react";
@@ -71,8 +71,8 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ errors });
   } // DB의 유저 비밀번호와 맞지 않을 경우
 
-  const sessionId = userInfo._id
-  
+  const sessionId = userInfo._id;
+
   let session = await getSession(request.headers.get("cookie"));
   const returnTo = session.get("returnTo");
   const headers = await sessionCommit(request, sessionId);
@@ -85,7 +85,7 @@ export default function SignIn() {
   const isSubmitting =
     navigation.state === "submitting" || navigation.state === "loading";
   const data = useActionData<typeof action>();
-  console.log(data);
+  console.log("??", data);
 
   return (
     <div className="h-screen flex justify-center items-center">
@@ -122,9 +122,7 @@ export default function SignIn() {
             name="password"
             minLength="5"
             className={`h-12 mt-1 p-2 border rounded-md ${
-              data?.errors.status === 2
-                ? "border-red-500"
-                : ""
+              data?.errors.status === 2 ? "border-red-500" : ""
             }`}
           />
 
