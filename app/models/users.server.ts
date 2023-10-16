@@ -23,7 +23,8 @@ const UsersSchema = new Schema({
   ],
   avatar: 
   {
-    name: {type: String},
+    firstName: { type: String },
+    lastName: { type: String },
     imageUrl: { type: String}
   },
   createdAt: { type: Date, default: Date.now },

@@ -19,12 +19,20 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
 
   if (formData.get("_action") === "nameEdit") {
-    const changeName = formData.get("changeName");
-    const changeNameValidate = validateValue(changeName, "change name");
+    const changeFirstName = formData.get("changeFirstName");
+    const changeFirstNameValidate = validateValue(changeFirstName, "change name");
+    const changeLastName = formData.get("changeLastName");
+    const changeLastNameValidate = validateValue(changeLastName, "change name");
 
-    if (changeNameValidate !== true) {
-      const { status } = changeNameValidate;
-      const errors = { status: status, changeName: changeName };
+    if (changeFirstNameValidate !== true) {
+      const { status } = changeFirstNameValidate;
+      const errors = { status: status, firstName: changeFirstName, lastName: changeLastName };
+      return json({ errors });
+    }
+
+    if (changeLastNameValidate !== true) {
+      const { status } = changeLastNameValidate;
+      const errors = { status: status, firstName: changeFirstName, lastName: changeLastName };
       return json({ errors });
     }
 
@@ -34,7 +42,8 @@ export async function action({ request }: ActionFunctionArgs) {
       { _id: sessionId },
       {
         $set: {
-          "avatar.name": changeName,
+          "avatar.firstName": changeFirstName,
+          "avatar.lastName": changeLastName,
           "updatedAt": now
         },
       }
@@ -48,7 +57,6 @@ export async function action({ request }: ActionFunctionArgs) {
   if (formData.get("_action") === "imageEdit") {
 
     const changeImage = formData.get("changeImage");
-    console.log(typeof changeImage);
 
     await Users.updateOne(
       { _id: sessionId },
@@ -91,34 +99,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function testing() {
   const data = useLoaderData<typeof loader>();
   
-  // const [content, setContent] = useState("");
-  
-  // const [uploadedImg, setUploadedImg] = useState({
-  //   fileName: "",
-  //   fillPath: ""
-  // });
-
-  // const onChange = e => {
-  //   setContent(e.target.files[0]);
-  // };
-
-  // const onSubmit = e => {
-  //   e.preventDefault();
-  //   const formData = new FormData();
-  //   formData.append("img", content); 
-  //   axios
-  //     .post("/upload", formData)
-  //     .then(res => {
-  //       const { fileName } = res.data;
-  //       console.log(fileName);
-  //       setUploadedImg({ fileName, filePath: `${process.env.BASE_URL}/img/${fileName}` });
-  //       alert("The file is successfully uploaded");
-  //     })
-  //     .catch(err => {
-  //       console.error(err);
-  //     });
-  // };
-
   return (
     <div>
       <label>UserID</label>
@@ -127,11 +107,17 @@ export default function testing() {
         <div>
           <br></br>
           <label>Username</label>
-          <input
+          <br></br>
+          <div>
+            <input
             type="text"
-            defaultValue={data?.data.userName}
-            name="changeName"
-          />
+            defaultValue={data?.data.userName.firstName}
+            name="changeFirstName"/>
+            <input
+            type="text"
+            defaultValue={data?.data.userName.lastName}
+            name="changeLastName"/>
+          </div>
           <button type="submit" name="_action" value="nameEdit">
             edit
           </button>
