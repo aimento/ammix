@@ -97,14 +97,14 @@ export async function action({ request }: ActionFunctionArgs) {
     avatar: {
       firstName: "User_",
       lastName: Math.random().toString(36).substring(2, 11),
-      imageUrl: ""
+      imageUrl: "/uploads/favicon.ico"
     },
     createdAt: now,
     updatedAt: now,
   }); // 유저 생성
 
   const userInfo = await Users.findOne({ "emails.address": email });
-  const sessionId = userInfo._id
+  const sessionId = userInfo?._id
 
   let session = await getSession(request.headers.get("cookie"));
   const returnTo = session.get("returnTo");

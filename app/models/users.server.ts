@@ -25,7 +25,8 @@ const UsersSchema = new Schema({
   {
     firstName: { type: String },
     lastName: { type: String },
-    imageUrl: { type: String}
+    imageUrl: { type: String },
+    oldImageUrl: { type: String }
   },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date },
