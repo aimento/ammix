@@ -57,7 +57,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const [auths] = userInfo?.auths;
   const result = {
     username: userInfo?.username,
-    password: auths.secret.bcrypt,
+    password: auths?.secret?.bcrypt,
   };
 
   const comparePassword = await bcrypt.compare(password, result.password);
