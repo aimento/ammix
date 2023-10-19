@@ -1,6 +1,7 @@
-import { redirect, json } from "@remix-run/node";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import {
+  redirect,
+  json,
   unstable_composeUploadHandlers as composeUploadHandlers,
   unstable_createFileUploadHandler as createFileUploadHandler,
   unstable_createMemoryUploadHandler as createMemoryUploadHandler,
@@ -9,7 +10,7 @@ import {
 import { Users } from "../models/users.server";
 import { getSession } from "~/services/session.server";
 
-export async function action({ request }: ActionFunctionArgs) {
+export const action = async({ request }: ActionFunctionArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
 
   const sessionId = session.get(session.id);
@@ -17,7 +18,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const uploadHandler = composeUploadHandlers(
     createFileUploadHandler({
       directory: "public/uploads",
-      maxPartSize: 3000000,
+      // maxPartSize: 3000000,
     }),
     createMemoryUploadHandler()
   );
