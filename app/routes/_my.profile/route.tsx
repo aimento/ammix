@@ -97,6 +97,7 @@ export default function testing() {
 
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [showCancelButton, setShowCancelButton] = useState(true);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -108,16 +109,18 @@ export default function testing() {
       if (!allowedExtensions.includes(fileExtension)) {
         // 모달을 열어 지원하지 않는 파일 형식임을 알리기
         setShowModal(true);
+        setShowCancelButton(false);
         return;
       }
       setSelectedImage(URL.createObjectURL(file));
-      setShowModal(true);
+      setShowCancelButton(true);
     }
   };
 
   //모달닫기
   const closeModal = () => {
     setShowModal(false);
+    setShowCancelButton(true);
   };
 
   return (
@@ -188,6 +191,8 @@ export default function testing() {
                     onClose={closeModal}
                     showCancelButton={true}
                     imageUrl={selectedImage}
+                    showCancelButton={showCancelButton}
+                    message="유효하지 않은 확장자입니다."
                   >
                     <img
                       src={selectedImage}
