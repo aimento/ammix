@@ -1,6 +1,12 @@
 /** @type {import('@remix-run/dev').AppConfig} */
 export default {
   ignoredRouteFiles: ["**/.*"],
+  routes(defineRoutes) {
+    return defineRoutes((route) => {
+      // postId를 동적 파라미터로 사용하여 라우팅 설정
+      route(":postId", "routes/_p.[postId]/route.tsx");
+    });
+  },
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
   // publicPath: "/build/",

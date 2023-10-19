@@ -27,8 +27,9 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   try {
+    const newPostId = uuidv4();
     const newPost = await Posts.create({
-      postId: uuidv4(),
+      postId: newPostId,
       username: userData.userId,
       content: content.trim(),
       avatar: {
@@ -40,10 +41,10 @@ export async function action({ request }: ActionFunctionArgs) {
     });
 
     await newPost.save();
-
+    console.log("New Post ddID: ", newPostId);
     console.log("New Post ID: ", newPost.postId);
 
-    return redirect(`/${newPost.postId}`);
+    return redirect(`/${newPostId}`);
   } catch (error) {
     return json(
       { error: `An error occurred: ${error.message}` },
