@@ -1,56 +1,12 @@
-<<<<<<< HEAD
 import { redirect, json } from "@remix-run/node";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
-<<<<<<< HEAD
-import {
-=======
-import type { ActionArgs } from "@remix-run/node";
-import {
-  json,
-  redirect,
->>>>>>> e85f41e (add : 이미지 업로드)
-  unstable_composeUploadHandlers as composeUploadHandlers,
-  unstable_createFileUploadHandler as createFileUploadHandler,
-  unstable_createMemoryUploadHandler as createMemoryUploadHandler,
-  unstable_parseMultipartFormData as parseMultipartFormData,
-<<<<<<< HEAD
-} from "@remix-run/node";
-=======
-import { unstable_createFileUploadHandler } from "@remix-run/node";
->>>>>>> ad3c40f (add : 이름, 생성일시, 수정일시)
-=======
-  ActionFunctionArgs,
-} from "@remix-run/node";
->>>>>>> e85f41e (add : 이미지 업로드)
 import { Users } from "../../models/users.server";
 import { Form, useLoaderData } from "@remix-run/react";
 import { getSession } from "~/services/session.server";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { getSession } from "~/services/session.server";
 import { validateValue } from "~/utils/validator";
 import { sessionCommit } from "~/services/commit.server";
-import Avatar from "../components/Avata";
-import { findImageFile } from "~/services/search-file.server";
-
-export const imageUploadAction = async ({ request }: ActionArgs) => {
-  const uploadHandler = composeUploadHandlers(
-    createFileUploadHandler({
-      directory: "public/uploads",
-    }),
-    createMemoryUploadHandler()
-  );
-
-  const formData = await parseMultipartFormData(request, uploadHandler);
-  const image = formData.get("img");
-
-  if (!image || typeof image === "string") {
-    return json({ error: "something wrong", imgSrc: null });
-  }
-
-  return json({ error: null, imgSrc: image.name });
-};
-
-export const editNameAction = async ({ request }) => {
+import React, { useState } from "react";
+import Modal from "../components/modal";
 import { findImageFile } from "~/services/search-file.server";
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -59,7 +15,6 @@ export async function action({ request }: ActionFunctionArgs) {
   const sessionId = session.get(session.id);
   let formData = await request.formData();
 
-  //이름 바꾸기 명령 시작
   if (formData.get("_action") === "nameEdit") {
     const changeFirstName = formData.get("changeFirstName");
     const changeFirstNameValidate = validateValue(
@@ -67,8 +22,6 @@ export async function action({ request }: ActionFunctionArgs) {
       "change name"
     );
     const changeLastName = formData.get("changeLastName");
-
-    // 이름이 비어있는 등의 양식 검증
     const changeLastNameValidate = validateValue(changeLastName, "change name");
 
     if (changeFirstNameValidate !== true) {
@@ -108,60 +61,27 @@ export async function action({ request }: ActionFunctionArgs) {
 
     return redirect("/profile", { headers });
   }
-<<<<<<< HEAD
-
-<<<<<<< HEAD
-    // const uploadHandler = composeUploadHandlers(
-    //   createFileUploadHandler({
-    //     directory: "./Desktop/public/uploads",
-    //     // maxPartSize: 30000,
-    //   }),
-    //   createMemoryUploadHandler()
-    // );
-    // const imageForm = await parseMultipartFormData(request, uploadHandler);
-    // const image = imageForm.get("img");
-    // if (!image || typeof image === "string") {
-    //   return json({ error: "something wrong", imgSrc: null });
-    // }
-
-    // return json({ error: null, imgSrc: image.name });
-=======
-  if (formData.get("_action") === "imageEdit") {
-    const changeImage = formData.get("changeImage");
->>>>>>> ad3c40f (add : 이름, 생성일시, 수정일시)
-
-    // const changeImage = formData.get("changeImage");
-
-    //   await Users.updateOne(
-    //     { _id: sessionId },
-    //     {
-    //       $set: {
-    //         "avatar.imageUrl": changeImage,
-    //       },
-    //     }
-    //   );
-
   return null;
 }
-=======
-};
->>>>>>> e85f41e (add : 이미지 업로드)
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request.headers.get("Cookie"));
 
   const sessionId = session.get(session.id);
   const userData = session.get("userdata");
+  if (!userData) {
+    return redirect("/sign-in");
+  }
 
   // 로그인이 되어 있지 않는 경우
   if (!userData) {
     return redirect("/sign-in");
   }
 
-  const userInfo = await Users.findOne({ _id: sessionId });
+  let userInfo = await Users.findOne({ _id: sessionId });
   const avatarImageUrl = userInfo?.avatar?.imageUrl;
-  const createdAt = userInfo.createdAt;
-  const updatedAt = userInfo.updatedAt;
+  const createdAt = userInfo?.createdAt;
+  const updatedAt = userInfo?.updatedAt;
 
   // 세션에 쿠키가 있으나 유저 정보가 없을 경우
   if (!userInfo) {
@@ -177,7 +97,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       { _id: sessionId },
       {
         $set: {
-          "avatar.imageUrl": "/uploads/favicon.ico",
+          "avatar.imageUrl": `${process.env.DEFAULT_IMAGE}`,
         },
       }
     );
@@ -186,7 +106,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     userData.imageUrl = userInfo?.avatar?.imageUrl;
   } else {
-    // 스토리지에 저장된 파일이 없을 경우
+    // 스토리지에 저장된 파일 검증
     await findImageFile(sessionId, userImage);
 
     userInfo = await Users.findOne({ _id: sessionId });
@@ -194,7 +114,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     userData.imageUrl = userInfo?.avatar?.imageUrl;
   }
 
-  if (!userInfo.avatar.imageUrl) {
+  if (!userInfo?.avatar?.imageUrl) {
     userData.imageUrl = "";
   } else {
     userData.imageUrl = userInfo.avatar.imageUrl;
@@ -210,71 +130,38 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({ data: getUserInfo });
 }
 
-export default function profile() {
+export default function testing() {
   const data = useLoaderData<typeof loader>();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [showCancelButton, setShowCancelButton] = useState(true);
 
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];}
+  const handleFileUpload = async (event: any) => {
+    const file = event.target.files[0];
 
-  function onChange(f: any) {
-    let file = f.files;
+    const allowedExtensions = ["png", "jpeg", "jpg"];
 
-<<<<<<< HEAD
-    if (!/\.(png|jpeg)$/i.test(file[0].name)) {
-      alert("업로드할 수 없는 파일입니다.\n\n현재 파일 : " + file[0].name);
-      file[0].name = ""; // 해당 태그의 파일이름값을 비워준다.
-    } else return;
-  }
-<<<<<<< HEAD
-=======
     if (file) {
       const fileExtension = file.name.split(".").pop()?.toLowerCase();
       if (!allowedExtensions.includes(fileExtension)) {
         // 모달을 열어 지원하지 않는 파일 형식임을 알리기
         setShowModal(true);
+        setShowCancelButton(false);
         return;
       }
+      setSelectedImage(URL.createObjectURL(file));
+      setShowCancelButton(true);
     }
   };
 
   //모달닫기
   const closeModal = () => {
     setShowModal(false);
+    setShowCancelButton(true);
   };
->>>>>>> 1e4c259 (add : 테일윈드 적용)
-
-=======
->>>>>>> ad3c40f (add : 이름, 생성일시, 수정일시)
-  return (
-=======
 
   return (
-    <div>
-      <Avatar imageUrl={`profile/${data?.imgSrc}`} />
-      {/* 유저 아이디 표시 */}
-      <label>유저아이디</label>
-      {data ? <h4>{data.data.userId}</h4> : null}
-
-      <Form method="POST" action="/profile">
-        <div>
-          <div>
-            <label>이름 :</label>
-            <input
-              type="text"
-              defaultValue={data?.data.userName.lastName}
-              name="changeLastName"
-            />
-            <label>성 :</label>
-            <input
-              type="text"
-              defaultValue={data?.data.userName.firstName}
-              name="changeFirstName"
-            />
->>>>>>> 0ab8098 (feature : profile_bugfix)
     <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
       <div className="relative py-3 sm:max-w-xl sm:mx-auto">
         <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
@@ -406,37 +293,6 @@ export default function profile() {
             </div>
           </div>
         </div>
-      </form>
-      <br></br>
-      <Form method="POST" encType="multipart/form-data" action="/upload">
-        <div>
-          <br></br>
-          <label>UserImage</label>
-          <input type="file" name="changeImage" />
-          <br></br>
-        </div>
-        <button type="submit" name="_action" value="imageEdit">
-          edit
-        </button>
-<<<<<<< HEAD
-<<<<<<< HEAD
-      </Form>
-      {data?.data.userImage? (
-=======
->>>>>>> 0ab8098 (feature : profile_bugfix)
-        <div>
-      </Form>
-
-      {/* 생성 및 수정 날짜 표시 */}
-      <div>
-        <label>생성날짜:</label>{" "}
-        {data ? (
-          <h4>{new Date(data.data.createdAt).toLocaleString()}</h4>
-        ) : null}
-        <label>수정날짜:</label>{" "}
-        {data ? (
-          <h4>{new Date(data.data.updatedAt).toLocaleString()}</h4>
-        ) : null}
       </div>
     </div>
   );
