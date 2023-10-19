@@ -97,7 +97,7 @@ export async function action({ request }: ActionFunctionArgs) {
     avatar: {
       firstName: "User_",
       lastName: Math.random().toString(36).substring(2, 11),
-      imageUrl: "/uploads/favicon.ico"
+      imageUrl: `${process.env.DEFAULT_IMAGE}`
     },
     createdAt: now,
     updatedAt: now,
