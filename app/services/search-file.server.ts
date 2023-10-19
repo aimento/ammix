@@ -10,7 +10,7 @@ export const findImageFile = async (sessionId: any, userImage: any) => {
       { _id: sessionId },
       {
         $set: {
-          "avatar.imageUrl": "/uploads/favicon.ico",
+          "avatar.imageUrl": `${process.env.DEFAULT_IMAGE}`,
         },
       }
     );

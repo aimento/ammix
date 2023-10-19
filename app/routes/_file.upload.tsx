@@ -19,20 +19,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const userInfo = await Users.findOne({ _id: sessionId });
 
-  // avatar 이미지가 없을 경우
-  if (!userInfo?.avatar?.imageUrl) {
-    await Users.updateOne(
-      { _id: sessionId },
-      {
-        $set: {
-          "avatar.imageUrl": "/uploads/favicon.ico",
-        },
-      }
-    );
-
-    return redirect("/profile");
-  }
-
   const oldUserImageUrl = userInfo?.avatar?.imageUrl;
 
   // 스토리지 파일 전송을 위한 준비
@@ -79,16 +65,7 @@ async function deleteImage(
   try {
     const now = new Date();
 
-    if (imageUrl === "/uploads/") {
-      await Users.updateOne(
-        { _id: sessionId },
-        {
-          $set: {
-            "avatar.imageUrl": "/uploads/favicon.ico",
-          },
-        }
-      );
-    } else if (oldUserImageUrl === "/uploads/favicon.ico") {
+    if (oldUserImageUrl === process.env.DEFAULT_IMAGE) {
       await Users.updateOne(
         { _id: sessionId },
         {
