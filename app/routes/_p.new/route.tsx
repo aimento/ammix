@@ -1,49 +1,57 @@
-import { json, ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import {
+  redirect,
+  json,
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+} from "@remix-run/node";
 import { getSession } from "~/services/session.server";
 import { Posts } from "../../models/posts.server";
 import { Form } from "@remix-run/react";
 import { Users } from "~/models/users.server";
 import { reconnectServer } from "../../services/dbconnect.server";
+import { v4 as uuidv4 } from "uuid";
 
 export async function action({ request }: ActionFunctionArgs) {
   reconnectServer();
+
+  const session = await getSession(request.headers.get("Cookie"));
+  const sessionId = session.get("session.id");
+  const userData = session.get("userdata");
+  const now = new Date();
+
+  const formData = await request.formData();
+  const content = formData.get("content");
+
+  if (!content || content.trim() === "") {
+    return json({ error: "Content is required." }, { status: 400 });
+  }
+
   try {
-    const session = await getSession(request.headers.get("Cookie"));
-    const userId = session.get("userId");
-
-    if (!userId) {
-      return json({ error: "User is not authenticated." }, { status: 401 });
-    }
-
-    const formData = await request.formData();
-    const content = formData.get("content");
-
-    if (!content || content.trim() === "") {
-      return json({ error: "Content is required." }, { status: 400 });
-    }
-
     const newPost = await Posts.create({
-      userId,
-      content: content,
+      postId: uuidv4(),
+      username: userData.userId,
+      content: content.trim(),
+      avatar: {
+        firstName: userData.userName.firstName,
+        lastName: userData.userName.lastName,
+      },
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     await newPost.save();
 
-    return new Response(null, {
-      headers: {
-        Location: `/routes/${newPost._id}/route/tsx`,
-      },
-      status: 302,
-    });
+    console.log("New Post ID: ", newPost.postId);
+
+    return redirect(`/${newPost.postId}`);
   } catch (error) {
     return json(
-      { error: `An error occurred while creating the post: ${error.message}` },
+      { error: `An error occurred: ${error.message}` },
       { status: 500 }
     );
   }
 }
+
 export async function loader({ request }: LoaderFunctionArgs) {
   reconnectServer();
 
@@ -52,7 +60,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const userData = session.get("userdata");
 
   if (!userData) {
-    return redirect("/sign-in");
+    return { redirect: "/sign-in" };
   }
 
   const userInfo = await Users.findOne({ _id: sessionId });
@@ -67,12 +75,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({ user });
 }
 
-export default function New() {
-  // const loaderData = useLoaderData<typeof loader>();
-  // const actionData = useActionData<typeof action>();
+export default function NewPostPage() {
   return (
     <div>
-      <h1>new</h1>
+      <h1>Create a new post</h1>
       <Form method="post">
         <div>
           <label htmlFor="content">Content:</label>
