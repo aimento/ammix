@@ -28,7 +28,7 @@ const UsersSchema = new Schema({
     imageUrl: { type: String },
     oldImageUrl: { type: String }
   },
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date },
   updatedAt: { type: Date },
 });
 

@@ -8,8 +8,11 @@ import { sessionCommit } from "~/services/commit.server";
 import React, { useState } from "react";
 import Modal from "../components/modal";
 import { findImageFile } from "~/services/search-file.server";
+import { reconnectServer } from "../../services/dbconnect.server";
 
 export async function action({ request }: ActionFunctionArgs) {
+  reconnectServer();
+  
   const session = await getSession(request.headers.get("Cookie"));
 
   const sessionId = session.get(session.id);
@@ -65,6 +68,8 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  reconnectServer();
+
   const session = await getSession(request.headers.get("Cookie"));
 
   const sessionId = session.get(session.id);
