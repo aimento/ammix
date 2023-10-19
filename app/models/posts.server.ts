@@ -12,7 +12,7 @@ const PostsSchema = new Schema({
   updatedAt: { type: Date },
 });
 
-PostsSchema.index({ username: 1 }, { unique: true });
-PostsSchema.index({ "emails.address": 1 }, { unique: true });
+// PostsSchema.index({ username: 1 }, { unique: true });
+// PostsSchema.index({ "emails.address": 1 }, { unique: true });
 
 export const Posts = model("Posts", PostsSchema);

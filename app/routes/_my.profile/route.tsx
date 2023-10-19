@@ -135,7 +135,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({ data: getUserInfo });
 }
 
-export default function testing() {
+export default function profile() {
   const data = useLoaderData<typeof loader>();
 
   const [showModal, setShowModal] = useState(false);
