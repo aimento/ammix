@@ -1,4 +1,4 @@
-import { json, LoaderFunction } from "remix";
+import { json, LoaderFunction } from "@remix-run/node";
 import { Posts } from "../../models/posts.server";
 //상세보기
 export let loader: LoaderFunction = async ({ params }) => {
@@ -12,10 +12,10 @@ export let action: LoaderFunction = async ({ request, params }) => {
   return json({}, { status: 204 });
 };
 
-export default function PostAdd() {
+export default function PostId() {
   return (
     <div>
-      <h1>어디임</h1>
+      <h1>postid</h1>
     </div>
   );
 }

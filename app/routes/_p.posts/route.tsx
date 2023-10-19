@@ -7,10 +7,10 @@ export let loader: LoaderFunction = async () => {
   return json(posts);
 };
 
-export default function PostAdd() {
+export default function Post() {
   return (
     <div>
-      <h1>하</h1>
+      <h1>전체불러오기</h1>
     </div>
   );
 }
