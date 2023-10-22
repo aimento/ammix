@@ -12,7 +12,7 @@ import { reconnectServer } from "../../services/dbconnect.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   reconnectServer();
-  
+
   const session = await getSession(request.headers.get("Cookie"));
 
   const sessionId = session.get(session.id);
@@ -234,7 +234,7 @@ export default function profile() {
                     onClose={closeModal}
                     showCancelButton={true}
                     imageUrl={selectedImage}
-                    showCancelButton={showCancelButton}
+                    // showCancelButton={showCancelButton}
                     message="유효하지 않은 확장자입니다."
                   >
                     <img

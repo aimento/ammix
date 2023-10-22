@@ -1,11 +1,11 @@
 import { model, Schema } from "mongoose";
-// import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 const PostsSchema = new Schema({
-  // postId: {
-  //   type: String,
-  //   default: uuidv4,
-  // },
+  postId: {
+    type: String,
+    default: uuidv4,
+  },
   username: { type: String },
   content: { type: String },
   avatar: {
