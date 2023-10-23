@@ -21,6 +21,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const email = formData.get("email");
   const password = formData.get("password");
   const username = formData.get("username");
+  const phoneNumber = formData.get("phoneNumber"); // 핸드폰 번호 추가
+  const address = formData.get("address"); // 주소 추가
 
   let errors = {};
   const emailValidate = validateEmail(email); // 이메일 양식 검증
@@ -88,6 +90,8 @@ export async function action({ request }: ActionFunctionArgs) {
         },
       },
     ],
+    phoneNumber: `${phoneNumber}`, // 핸드폰 번호 저장
+    address: `${address}`,
     emails: [
       {
         address: `${email}`,
@@ -97,20 +101,20 @@ export async function action({ request }: ActionFunctionArgs) {
     avatar: {
       firstName: "User_",
       lastName: Math.random().toString(36).substring(2, 11),
-      imageUrl: `${process.env.DEFAULT_IMAGE}`
+      imageUrl: `${process.env.DEFAULT_IMAGE}`,
     },
     createdAt: now,
     updatedAt: now,
   }); // 유저 생성
 
   const userInfo = await Users.findOne({ "emails.address": email });
-  const sessionId = userInfo?._id
+  const sessionId = userInfo?._id;
 
   let session = await getSession(request.headers.get("cookie"));
   const returnTo = session.get("returnTo");
   const headers = await sessionCommit(request, sessionId);
 
-  return redirect( returnTo || "/", { headers });
+  return redirect(returnTo || "/home", { headers });
 }
 
 export default function SignUp() {
@@ -121,59 +125,113 @@ export default function SignUp() {
   console.log("Navigation State:", navigation.state);
 
   const data = useActionData<typeof action>();
+  const [step, setStep] = useState(1); // 현재 단계 상태
+
+  const nextStep = () => {
+    setStep(step + 1);
+  };
 
   return (
     <div className="h-screen flex justify-center items-center">
       <Form
         onSubmit={(e) => {
-          console.log("Form submitted");
+          e.preventDefault(); // 기본 제출 동작을 막습니다.
+
+          if (step === 3) {
+            // 회원가입 단계에서 제출될 때만 액션 실행
+            // 다른 단계에서는 다음 단계로 이동
+            navigation("/home"); // 이 부분을 수정하여 원하는 경로로 리다이렉트
+          } else {
+            nextStep(); // 다음 단계로 이동
+          }
         }}
         method="POST"
         className="w-full max-w-lg p-8 flex flex-col space-y-6"
       >
-        <div className="flex flex-col space-y-2">
-          <br></br>
-          <label className="block text-sm font-medium text-gray-700">
-            아이디
-          </label>
-          <input
-            type="text"
-            defaultValue={data?.errors.username}
-            name="username"
-            className={`h-12 mt-1 p-2 border rounded-md ${
-              data?.errors.username ? "border-red-500" : ""
-            } ${data?.errors.email ? "" : "border-gray-300"}`}
-          />
+        {step === 1 && (
+          <div className="flex flex-col space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              약관 동의
+            </label>
+            {/* 약관 동의에 관련된 폼 필드 및 로직 추가 */}
+          </div>
+        )}
+        {step === 2 && (
+          <div>
+            <div className="flex flex-col space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                핸드폰 번호
+              </label>
+              <input
+                type="text"
+                name="phoneNumber"
+                className="h-12 mt-1 p-2 border rounded-md"
+              />
+            </div>
+            <div className="flex flex-col space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                주소
+              </label>
+              <input
+                type="text"
+                name="address"
+                className="h-12 mt-1 p-2 border rounded-md"
+              />
+            </div>
+          </div>
+        )}
+        {step === 3 && (
+          <div>
+            <div className="flex flex-col space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                아이디
+              </label>
+              <input
+                type="text"
+                defaultValue={data?.errors.username}
+                name="username"
+                className={`h-12 mt-1 p-2 border rounded-md ${
+                  data?.errors.username ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+            </div>
+            <div className="flex flex-col space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                비밀번호
+              </label>
+              <input
+                type="password"
+                minLength="5"
+                name="password"
+                className="h-12 mt-1 p-2 border rounded-md"
+              />
+            </div>
+            <div className="flex flex-col space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                이메일
+              </label>
+              <input
+                type="text"
+                defaultValue={data?.errors.email}
+                name="email"
+                className={`h-12 mt-1 p-2 border rounded-md ${
+                  data?.errors.email ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+              {data?.errors.message ? (
+                <p className="text-red-500">{data.errors.message}</p>
+              ) : null}
+            </div>
+            {/* 다른 회원가입 관련 폼 필드 및 로직 추가 */}
+          </div>
+        )}
+        <div>
+          {step < 3 ? (
+            <button type="submit">다음</button>
+          ) : (
+            <AuthButton label="회원가입" isSubmitting={isSubmitting} />
+          )}
         </div>
-        <div className="flex flex-col space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            비밀번호
-          </label>
-          <input
-            type="password"
-            minLength="5"
-            name="password"
-            className="h-12 mt-1 p-2 border rounded-md"
-          />
-        </div>
-        <div className="flex flex-col space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            이메일
-          </label>
-          <input
-            type="text"
-            defaultValue={data?.errors.email}
-            name="email"
-            className={`h-12 mt-1 p-2 border rounded-md ${
-              data?.errors.email ? "border-red-500" : ""
-            } ${data?.errors.username ? "" : "border-gray-300"}`}
-          />
-          {data?.errors.message ? (
-            <p className="text-red-500">{data.errors.message}</p>
-          ) : null}
-        </div>
-
-        <AuthButton label="회원가입" isSubmitting={isSubmitting} />
       </Form>
     </div>
   );
