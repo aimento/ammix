@@ -21,12 +21,13 @@ const UsersSchema = new Schema({
       expireAt: { type: String },
     },
   ],
-  avatar: 
-  {
+  phoneNumber: { type: String },
+  address: { type: String },
+  avatar: {
     firstName: { type: String },
     lastName: { type: String },
     imageUrl: { type: String },
-    oldImageUrl: { type: String }
+    oldImageUrl: { type: String },
   },
   createdAt: { type: Date },
   updatedAt: { type: Date },

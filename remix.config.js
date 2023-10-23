@@ -5,6 +5,20 @@ export default {
     return defineRoutes((route) => {
       // postId를 동적 파라미터로 사용하여 라우팅 설정
       route(":postId", "routes/_p.[postId]/route.tsx");
+      // route("_auth.sign-up", "routes/_auth.sign-up/route.tsx");
+      // route(
+      //   "_auth.sign-up/agreement",
+      //   "routes/_auth.sign-up/agreement/route.tsx"
+      // );
+      // route(
+      //   "_auth.sign-up/basic-info",
+      //   "routes/_auth.sign-up/basic-info/route.tsx"
+      // );
+      // route(
+      //   "_auth.sign-up/extra-info",
+      //   "routes/_auth.sign-up/extra-info/route.tsx"
+      // );
+      // route("sign-up/agreement", "routes/_auth.sign-up/agreement/route.tsx");
     });
   },
   // appDirectory: "app",
